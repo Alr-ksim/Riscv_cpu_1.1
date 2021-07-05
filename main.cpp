@@ -78,8 +78,8 @@ void halt(){
 }
 
 int main(){
-    freopen("sample.data", "r", stdin);
-    freopen("output.txt", "w", stdout);
+    // freopen("sample.data", "r", stdin);
+    // freopen("output.txt", "w", stdout);
     readle();
     uint haz1[2], haz2[2];
     for (int i = 0;i < 2;i++) haz1[i] = haz2[i] = 0u;
