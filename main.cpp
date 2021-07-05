@@ -9,6 +9,7 @@
 #include "analysis.hpp"
 #include "carried.hpp"
 #include "loads.hpp"
+#include "prophecy.hpp"
 
 using namespace std;
 using uint = unsigned;
@@ -19,10 +20,12 @@ inptr cainp;
 wrptr cawrp;
 
 const int Csize = 6;
+const int Psize = 5;
 uint reg[32];
 char ram[1 << 20];
-int cains;
+int cains, proins;
 cdptr code_cache[Csize];
+procy pro(Psize);
 
 inline void readle(){
     char s[64]; int cur = 0;
@@ -56,10 +59,15 @@ bool tryif(const uint &pc, cdptr &cdp){
     }
     return 1;
 }
-void reload(uint &pc, const uint &jpc){
+void reload(uint &pc, uint &npc, const uint &jpc){
     if (cacdp) delete cacdp, cacdp = nullptr;
-    if (tryif(jpc, cacdp)) { pc = jpc; return; }
-    else { pc = jpc-4; return; }
+    if (tryif(jpc, cacdp)) {
+        pc = jpc;
+        if (is_branch(cacdp->cmd)) npc = pro.quary(pc);
+        else npc = pc + 4;
+        return; 
+    }
+    else { pc = jpc-4; npc = jpc; return; }
 }
 
 bool haztest(uint *haz1,const int &h1, uint *haz2, const int &h2){
@@ -83,30 +91,37 @@ int main(){
     readle();
     uint haz1[2], haz2[2];
     for (int i = 0;i < 2;i++) haz1[i] = haz2[i] = 0u;
-    uint pc = 0, la = -1;
+    uint pc = 0, npc = 4;
     cacdp = code_catch(pc);
     int h1, h2, cnt = 1;
     int i = 0;
     while (true) {
+        // printf("\n-----------------------------------------------------------\n");
+        // printf("Pc: %u, Npc: %u\n", pc, npc);
         if (!cnt) break;
         h1 = 0, h2 = 0, cnt = 0;
         if (cawrp) {
+            // cawrp->tout();
             wrstation(cawrp, reg), delete cawrp, cawrp = nullptr;
         }
         if (cainp) {
+            // cainp->tout();
             cawrp = instation(cainp, ram), des(cainp), cainp = nullptr;
             if (cawrp) ++cnt;
             if (cawrp && cawrp->rd) haz1[h1++] = cawrp->rd;
         }
         if (cadat) {
-            uint jpc(cadat->pc);
+            // cadat->tout();
+            uint opc(cadat->pc), jpc(cadat->pc);
             cainp = transation(cadat, jpc), des(cadat), cadat = nullptr;
             if (cainp) ++cnt;
             if (cainp && (cainp->type == 1) && irptr(cainp)->rd) haz1[h1++] = irptr(cainp)->rd;
             if (cainp && (cainp->type == 3) && wrptr(cainp)->rd) haz1[h1++] = wrptr(cainp)->rd;
-            if (jpc + 4 != cdp_pc(cacdp)) reload(pc, jpc);
+            if (opc == jpc) jpc = opc + 4; 
+            if (jpc != cdp_pc(cacdp)) pro.excer(opc, jpc), reload(pc, npc, jpc);
         } 
         if (cacdp) {
+            // cacdp->tout();
             if (h1) {
                 hazload(cacdp->cmd, haz2, h2);
                 if (haztest(haz1, h1, haz2, h2)) continue;
@@ -114,8 +129,13 @@ int main(){
             cadat = sol(cacdp, reg), delete cacdp, cacdp = nullptr;
             if (cadat) ++cnt;
         }
-        if (tryif(pc+4, cacdp)) { pc += 4; ++cnt; }
+        if (tryif(npc, cacdp)) {
+            pc = npc; ++cnt;
+            if (is_branch(cacdp->cmd)) npc = pro.quary(pc);
+            else npc = pc+4;
+        }
     }
     halt();
+    // pro.report();
     return 0;
 }

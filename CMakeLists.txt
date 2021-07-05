@@ -12,4 +12,5 @@ add_executable(code
         analysis.hpp
         carried.hpp
         loads.hpp
+        prophecy.hpp
         )

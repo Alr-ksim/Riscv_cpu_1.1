@@ -17,6 +17,7 @@ using djptr = data_J *;
 
 const uint table[6][4] = 
     {{1, 51, 0, 0}, {3, 19, 3, 103}, {1, 35, 0, 0}, {1, 99, 0, 0}, {2, 55, 23, 0}, {1, 111, 0, 0}};
+const uint branch_type[3] = {111, 103, 99};
 commands anatype(const uint &cmd){
     uint op = Binum(cmd).slice(0, 7);
     for (int i = 0;i < 6;i++){
@@ -25,6 +26,12 @@ commands anatype(const uint &cmd){
             if (op == table[i][j]) return commands(i);
     }
     return commands(6);
+}
+bool is_branch(const uint &cmd){
+    uint op = Binum(cmd).slice(0, 7);
+    for (int i = 0;i < 3;i++)
+        if (op == branch_type[i]) return 1;
+    return 0;
 }
 daptr sol_R(const cdptr cdp, const uint *rg){
     Binum bins(cdp->cmd);
