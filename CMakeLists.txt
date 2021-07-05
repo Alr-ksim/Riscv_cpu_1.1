@@ -1,7 +1,7 @@
   
 cmake_minimum_required(VERSION 3.16)
 
-project(RISC_V_Simulator_Test)
+project(RISC_V_Simulator_1.5)
 
 set(CMAKE_CXX_STANDARD 14)
 
