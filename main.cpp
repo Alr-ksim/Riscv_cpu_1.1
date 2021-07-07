@@ -20,7 +20,7 @@ inptr cainp;
 wrptr cawrp;
 
 const int Csize = 6;
-const int Psize = 5;
+const int Psize = 15;
 uint reg[32];
 char ram[1 << 20];
 int cains, proins;
@@ -113,12 +113,17 @@ int main(){
         if (cadat) {
             // cadat->tout();
             uint opc(cadat->pc), jpc(cadat->pc);
+            bool flag = is_branch(cadat->op);
             cainp = transation(cadat, jpc), des(cadat), cadat = nullptr;
             if (cainp) ++cnt;
             if (cainp && (cainp->type == 1) && irptr(cainp)->rd) haz1[h1++] = irptr(cainp)->rd;
             if (cainp && (cainp->type == 3) && wrptr(cainp)->rd) haz1[h1++] = wrptr(cainp)->rd;
-            if (opc == jpc) jpc = opc + 4; 
-            if (jpc != cdp_pc(cacdp)) pro.excer(opc, jpc), reload(pc, npc, jpc);
+            if (flag){
+                if (opc == jpc) jpc = opc + 4; 
+                if (jpc != cdp_pc(cacdp)) pro.excer(opc, jpc, 1), reload(pc, npc, jpc);
+                else pro.excer(opc, jpc, 0);
+            }
+            
         } 
         if (cacdp) {
             // cacdp->tout();

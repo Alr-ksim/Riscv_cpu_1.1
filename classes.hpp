@@ -53,18 +53,18 @@ class data {
     public:
     commands cd;
     uint pc;
+    uint op;
     data() : cd(W) {};
-    data(uint p, commands c) :pc(p), cd(c) {}
+    data(uint p, commands c, uint o) :pc(p), cd(c), op(o) {}
     virtual void tout() = 0;
 };
 
 class data_R : public data {
     public:
-    uint op;
     uint fun1, fun2;
     uint rs1, rs2, rd;
     data_R(uint p, commands c, uint o, uint f1, uint f2, uint r1, uint r2, uint r):
-        data(p, c), op(o), fun1(f1), fun2(f2), rs1(r1), rs2(r2), rd(r) {}
+        data(p, c, o), fun1(f1), fun2(f2), rs1(r1), rs2(r2), rd(r) {}
     virtual void tout() {
         printf("#R : \n");
         printf("OP: "); Binum(op, 7).tout();
@@ -77,12 +77,11 @@ class data_R : public data {
 };
 class data_I : public data {
     public:
-    uint op;
     uint fun;
     uint rs, rd;
     uint imm;
     data_I(uint p, commands c, uint o, uint f, uint r1, uint r, uint im):
-        data(p, c), op(o), fun(f), rs(r1), rd(r), imm(im) {}
+        data(p, c, o), fun(f), rs(r1), rd(r), imm(im) {}
     virtual void tout() {
         printf("#I : \n");
         printf("OP: "); Binum(op, 7).tout();
@@ -94,12 +93,11 @@ class data_I : public data {
 };
 class data_S : public data {
     public:
-    uint op;
     uint fun;
     uint rs1, rs2;
     uint imm;
     data_S(uint p, commands c, uint o, uint f, uint r1, uint r2, uint im):
-        data(p, c), op(o), fun(f), rs1(r1), rs2(r2), imm(im) {}
+        data(p, c, o), fun(f), rs1(r1), rs2(r2), imm(im) {}
     virtual void tout() {
         printf("#S : \n");
         printf("OP: "); Binum(op, 7).tout();
@@ -111,12 +109,11 @@ class data_S : public data {
 };
 class data_B : public data {
     public:
-    uint op;
     uint fun;
     uint rs1, rs2;
     uint imm;
     data_B(uint p, commands c, uint o, uint f, uint r1, uint r2, uint im):
-        data(p, c), op(o), fun(f), rs1(r1), rs2(r2), imm(im) {}
+        data(p, c, o), fun(f), rs1(r1), rs2(r2), imm(im) {}
     virtual void tout() {
         printf("#B : \n");
         printf("OP: "); Binum(op, 7).tout();
@@ -128,10 +125,9 @@ class data_B : public data {
 };
 class data_U : public data {
     public:
-    uint op;
     uint rd;
     uint imm;
-    data_U(uint p, commands c, uint o, uint r, uint im): data(p, c), op(o), rd(r), imm(im) {}
+    data_U(uint p, commands c, uint o, uint r, uint im): data(p, c, o), rd(r), imm(im) {}
     virtual void tout() {
         printf("#U : \n");
         printf("OP: "); Binum(op, 7).tout();
@@ -141,10 +137,9 @@ class data_U : public data {
 };
 class data_J : public data {
     public:
-    uint op;
     uint rd;
     uint imm;
-    data_J(uint p, commands c, uint o, uint r, uint im): data(p, c), op(o), rd(r), imm(im) {}
+    data_J(uint p, commands c, uint o, uint r, uint im): data(p, c, o), rd(r), imm(im) {}
     virtual void tout() {
         printf("#J : \n");
         printf("OP: "); Binum(op, 7).tout();

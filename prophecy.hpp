@@ -52,8 +52,9 @@ class procy {
         if (pos == -1) return pc+4;
         else return pro[pos].ppcy();
     }
-    void excer(const uint &pc, const uint &npc){
-        uint pos = locate(pc); ++err;
+    void excer(const uint &pc, const uint &npc,const bool &er = 0){
+        uint pos = locate(pc);
+        if (er) ++err;
         if (pos == -1) pos = ins, pro[ins++].restore(pc);
         if (ins == len) ins = 0;
         pro[pos].deal(npc-pc);
